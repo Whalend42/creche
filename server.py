@@ -1,7 +1,7 @@
 import asyncio
 import websockets
 
-import lightshow as li
+from lightshow import LightShow
 from switches import Switches
 
 
@@ -9,26 +9,28 @@ from switches import Switches
 
 
 # actions: 
+# 0  quit
 # 1  run lightshow
 # 2  save program as X
 # 3  load program X
-# 4  turn on switch number X
-# 5  turn off switch number X
-# 6  quit
+# 4  get order
+# 5  turn on switch number X
+# 6  turn off switch number X
+
 
 actions = []
+actions["exit"] = 0
 actions["run"] = 1
 actions["save"] = 2
-actiosn["load"] = 3
-actions["on"] = 4
-actions["off"] = 5
-actions["exit"] = 6
+actions["load"] = 3
+actions["get"] = 4
+actions["on"] = 5
+actions["off"] = 6
 
 async def action(websocket, path):
-    global creche
     global el
     global actions
-    global order
+    global show
 
     cmd = await websocket.recv()
     print("< {}".format(cmd))
@@ -36,22 +38,30 @@ async def action(websocket, path):
     cmd = cmd.split('-')
 
     if cmd[0] == actions["run"]:
-        if order is not None:
-            li.lightshow(order, creche)
+        if show.order is not None:
+            show.start()
         #todo: else
     elif cmd[0] == actions["save"]:
-        if order is not None:
+        if show.order is not None:
             #todo: check cmd[1] is a valid file name
             if cmd[1] is not None:
-                li.save_order(cmd[1],order)
+                LightShow.save_order(cmd[1], show.order)
         #todo: both else
     elif cmd[0] == actions["load"]:
-
+        LightShow.load_order(cmd[1])
+    elif cmd[0] == actions["get"]:
+        # retrieve the order from the recieved data
+        order = LightShow.order_by_time(order)
+        show.set_order(order)
     elif cmd[0] == actions["on"]:
+        show.creche.inhibit_switch(cmd[1])
+        show.creche.force_on(cmd[1])
     elif cmd[0] == actions["off"]:
+        show.creche.inhibit_switch(cmd[1])
+        show.creche.force_off(cmd[1])
     elif cmd[0] == actions["exit"]:
         el.stop()
-        el.close()
+        #el.close()
 
 
 
@@ -62,9 +72,9 @@ async def action(websocket, path):
 
 
 
-
 creche = Switches(number_of_switches=16, pin_base=123, devices_ids=0, spi_port=0, console_mode=True)
 order = None
+show = LightShow(creche, order)
 start_server = websockets.serve(action, 'localhost', 8765)
 el = asyncio.get_event_loop()
 el.run_until_complete(start_server)
