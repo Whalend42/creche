@@ -18,7 +18,7 @@ from switches import Switches
 # 6  turn off switch number X
 
 
-actions = []
+actions = {}
 actions["exit"] = 0
 actions["run"] = 1
 actions["save"] = 2
@@ -26,6 +26,8 @@ actions["load"] = 3
 actions["get"] = 4
 actions["on"] = 5
 actions["off"] = 6
+
+ok_msg = "ok"
 
 async def action(websocket, path):
     global el
@@ -48,9 +50,11 @@ async def action(websocket, path):
                 LightShow.save_order(cmd[1], show.order)
         #todo: both else
     elif cmd[0] == actions["load"]:
-        LightShow.load_order(cmd[1])
+        order = LightShow.load_order(cmd[1])
+        show.set_order(order)
     elif cmd[0] == actions["get"]:
-        # retrieve the order from the recieved data
+        #todo: retrieve the order from the recieved data
+        order = cmd[1]
         order = LightShow.order_by_time(order)
         show.set_order(order)
     elif cmd[0] == actions["on"]:
@@ -65,9 +69,9 @@ async def action(websocket, path):
 
 
 
-    greeting = "Hello {}!".format(name)
-    await websocket.send(greeting)
-    print("> {}".format(greeting))
+    #greeting = "Hello {}!".format(name)
+    #await websocket.send(greeting)
+    #print("> {}".format(greeting))
 
 
 

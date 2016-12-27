@@ -1,6 +1,6 @@
 import time as t
 
-import wiringpi as wp
+#import wiringpi as wp
 from const import ON, OFF
 
 
@@ -78,6 +78,9 @@ class Switches:
 
     instance = None
     def __init__(self, number_of_switches, pin_base=123, devices_ids=0, spi_port=0, console_mode=True):
+        if not console_mode:
+            import wiringpi as wp
+
         if Switches.instance is None:
             Switches.instance = Switches.__Singleton(number_of_switches, pin_base, devices_ids, spi_port, console_mode)
         else:
