@@ -1,2 +1,12 @@
 *~
+
+server/*~
+
+switch_management/*~
+switch_management/ordering_saves/*~
+switch_management/ordering_saves/test.tmp
+
+tests/*~
+
 __pycache__/
+.idea/
