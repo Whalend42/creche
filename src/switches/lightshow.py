@@ -4,23 +4,16 @@ import threading
 
 from .const import STOPDELAY
 
-# import ordering as o
-# from switches import Switches
-
 
 class LightShow:
 
     def __init__(self, order_by_time, creche):
-        # threading.Thread.__init__(self)
         # todo: type checking
         self.order = order_by_time
         self.creche = creche
 
     def run(self):
-        # creche = Switches(number_of_switches=16, pin_base=123, devices_ids=0, spi_port=0, console_mode=True)
         previous_time = 0
-
-        print("creche: "+str(len(self.creche._state)))
 
         for time, switches in sorted(self.order.items()):
             t.sleep(time - previous_time)
@@ -30,8 +23,9 @@ class LightShow:
                 self.creche.inverse_switch(switch)
             print(str(self.creche)+"\n")
             previous_time = time
-            t.sleep(STOPDELAY)
-            self.creche
+        t.sleep(STOPDELAY)
+        self.creche.reset_all()
+        print("End of light show")
 
     def start(self):
         thread = threading.Thread(target=self.run)
@@ -74,9 +68,3 @@ class LightShow:
         with open(file_name, 'rb') as f:
             order = p.load(f)
         return order
-
-    # file_name = 'automatic_save.pickle'
-    # o.order_by_time = order_by_time(o.order_by_switches)
-    # save_order(file_name, o.order_by_time)
-    # light_show(load_order(file_name))
-    # light_show(o.order_by_time)

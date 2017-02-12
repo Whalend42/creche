@@ -70,6 +70,11 @@ class Switches:
                 if not self._console_mode:
                     wp.digitalWrite(switch_number-1, self._state[switch_number-1])
 
+        def reset_all(self):
+            for i in range(0, self._number_of_switches):
+                if not self._inhibited[i]:
+                    self._state[i] = OFF
+
         def __str__(self):
             str_repr = ''
             for i in range(0, self._number_of_switches):

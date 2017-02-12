@@ -43,7 +43,7 @@ async def action(websocket, path):
             if show.order is not None:
                 show.start()
                 if debug_mode:
-                    print("lightshow started normally")
+                    print("lightshow ran normally")
                 await websocket.send(ok_msg+"-")
             else:
                 if debug_mode:
@@ -71,10 +71,14 @@ async def action(websocket, path):
         elif cmd == CMD["load"]:
             if debug_mode:
                 print("trying to load")
-            order = LightShow.load_order(param)
-            show.set_order(order)
-            if debug_mode:
-                print("order successfully loaded")
+            try:
+                order = LightShow.load_order(param)
+                show.set_order(order)
+                if debug_mode:
+                    print("order successfully loaded")
+            except FileNotFoundError:
+                if debug_mode:
+                    print("Failed to load order - File not found")
 
         # retrieve an order from the received data
         elif cmd == CMD["get"]:
