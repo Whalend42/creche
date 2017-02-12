@@ -35,7 +35,6 @@ async def action(websocket, path):
         data = json.loads(data)
         cmd = data["cmd"]
         param = data["param"]
-        print(cmd)
 
         # run a light show
         if cmd == CMD["run"]:

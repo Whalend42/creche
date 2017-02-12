@@ -2,6 +2,8 @@ import time as t
 import pickle as p
 import threading
 
+from .const import STOPDELAY
+
 # import ordering as o
 # from switches import Switches
 
@@ -9,7 +11,6 @@ import threading
 class LightShow:
 
     def __init__(self, order_by_time, creche):
-        self.thread = threading.Thread(target=self.run)
         # threading.Thread.__init__(self)
         # todo: type checking
         self.order = order_by_time
@@ -29,6 +30,12 @@ class LightShow:
                 self.creche.inverse_switch(switch)
             print(str(self.creche)+"\n")
             previous_time = time
+            t.sleep(STOPDELAY)
+            self.creche
+
+    def start(self):
+        thread = threading.Thread(target=self.run)
+        thread.run()
 
     def set_order(self, order_by_time):
         # todo: type checking

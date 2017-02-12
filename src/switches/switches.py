@@ -95,6 +95,7 @@ class Switches:
         :param spi_port:
         :param console_mode:
         """
+
         if not console_mode:
             import wiringpi as wp
 
@@ -102,10 +103,10 @@ class Switches:
             Switches.instance = Switches.__Singleton(number_of_switches, pin_base, devices_ids, spi_port, console_mode)
         else:
             Switches.instance.number_of_switches = number_of_switches
-            Switches.instance.pin_base = pin_base
-            Switches.instance.devices_ids = devices_ids
-            Switches.instance.spi_port = spi_port
-            Switches.instance.console_mode = console_mode
+            Switches.instance.pin_base           = pin_base
+            Switches.instance.devices_ids        = devices_ids
+            Switches.instance.spi_port           = spi_port
+            Switches.instance.console_mode       = console_mode
 
     def __str__(self):
         return str(Switches.instance)
