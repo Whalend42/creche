@@ -25,4 +25,7 @@ async def some_tests():
 
             await websocket.send(json.dumps({'cmd': cmd, 'param': param}))
 
-asyncio.get_event_loop().run_until_complete(some_tests())
+try:
+    asyncio.get_event_loop().run_until_complete(some_tests())
+except OSError:
+    print("Server is not online")

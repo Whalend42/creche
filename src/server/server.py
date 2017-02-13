@@ -84,11 +84,10 @@ async def action(websocket, path):
         elif cmd == CMD["get"]:
             if debug_mode:
                 print("trying to get an order")
-            # order = json.loads(cmd[1])
             order = param
             if debug_mode:
                 print(order)
-            # todo: retrieve the order from the recieved data
+            # todo: retrieve the order from the received data
             # order = LightShow.order_by_time(order)
             show.set_order(order)
             if debug_mode:
