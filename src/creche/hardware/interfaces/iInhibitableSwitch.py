@@ -23,3 +23,7 @@ class IInhibitableSwitch(ISwitch):
     def isInhibited(self):
         pass
 
+    @abstractmethod
+    def jsonStatus(self):
+        pass
+

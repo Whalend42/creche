@@ -43,3 +43,11 @@ class IInhibitableSwitches(ISwitches):
     def areInhibited(self):
         pass
 
+    @abstractmethod
+    def jsonStatus(self, i):
+        pass
+
+    @abstractmethod
+    def allJsonStatuses(self):
+        pass
+

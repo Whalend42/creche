@@ -1,3 +1,5 @@
+import json
+
 from creche.hardware.interfaces.iInhibitableSwitch import IInhibitableSwitch
 from creche.hardware.status import Status
 
@@ -39,3 +41,10 @@ class InhibitableSwitch(IInhibitableSwitch):
 
     def isInhibited(self):
         return self.__inhibited
+
+    def jsonStatus(self):
+        fullStatus = {
+            "isOn": self.__status == Status.ON,
+            "isInhibited": self.__inhibited
+        }
+        return json.dumps(fullStatus)
