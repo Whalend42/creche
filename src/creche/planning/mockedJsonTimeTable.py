@@ -13,3 +13,19 @@ class MockedJsonTimeTable():
         }
         
         return rawData
+
+class MockedJsonTimeTable2():
+    
+    def __init__(self, file):
+        self.__file = file
+
+    def dictonnary(self):
+        rawData = {
+            "0": [(0, 2)],
+            "1": [(0, 2)],
+            "2": [],
+            "3": [(4, 5)],
+            "4": [(4, 5)],
+        }
+        
+        return rawData
