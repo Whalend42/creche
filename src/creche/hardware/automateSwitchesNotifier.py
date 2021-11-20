@@ -2,14 +2,10 @@ import time
 import threading
 
 from creche.hardware.interfaces.iAutomate import IAutomate
-
 from creche.planning.jsonPlanning import JsonPlanning
-#from creche.planning.instruction import Instruction
-
 from creche.planning.command import Command as Cmd
 
 class AutomateSwitchesNotifier(IAutomate, threading.Thread):
-#class AutomateSwitchesNotifier(threading.Thread):
 
     def __init__(self, switches, planning, notifiable):
         threading.Thread.__init__(self)
@@ -29,7 +25,6 @@ class AutomateSwitchesNotifier(IAutomate, threading.Thread):
             self.__lockPause.acquire()
 
             if self.__stop:
-                print("[Thread] Automate - stop current")
                 self.__stopThread()
                 break
                 
@@ -45,11 +40,10 @@ class AutomateSwitchesNotifier(IAutomate, threading.Thread):
                 self.__lockPause.release()
 
             # just to give time before next lockPause acquire 
-            # for an pause action to do acquire
+            # for a pause action to do acquire
             time.sleep(0.01)
 
         self.__notifiable.newStatus(self.__switches.allJsonStatuses())
-        print("[Thread] Automate - THE END")
 
     def run(self):
         while not self.__terminate:
@@ -57,10 +51,8 @@ class AutomateSwitchesNotifier(IAutomate, threading.Thread):
             if self.__terminate:
                 break
             self.__runAutomate()
-        print("[Thread] Automate - THE END FOREVER")
 
     def __releaseAllLocks():
-        # release all locks
         if self.__lockPause.locked():
             self.__lockPause.release()
         if self.__lockPlay.locked():
@@ -70,7 +62,6 @@ class AutomateSwitchesNotifier(IAutomate, threading.Thread):
 
     def terminate(self):
         self.__lockAction.acquire()
-        print("Terminate action starting")
         self.__terminate = True
         if self.__lockPlay.locked():
             self.__lockPlay.release()
@@ -89,27 +80,19 @@ class AutomateSwitchesNotifier(IAutomate, threading.Thread):
             self.__lockPause.release()
 
     def stop(self):
-        print("stop action part 1 1")
         self.__lockAction.acquire()
-        print("stop action part 1 2")
         self.__stop = True
-        print("stop action part 1 3")
         if self.__lockPause.locked():
-            print("stop action part 1 release pause")
             self.__lockPause.release()
-        print("stop action part 1 4")
 
     def __stopThread(self):
-        print("stop action part 2")
         self.__switches = self.__switches.releaseAll()
         self.__switches = self.__switches.allOff()
         self.__lockAction.release()
-        print("stop action finished")
 
     def pause(self):
         self.__lockAction.acquire()
         self.__lockPause.acquire()
-        print("Sould be paused")
         self.__lockAction.release()
 
     def resume(self):
