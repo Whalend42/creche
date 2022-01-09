@@ -1,5 +1,6 @@
 import time
 import threading
+import asyncio
 
 from creche.hardware.interfaces.iAutomate import IAutomate
 from creche.planning.jsonPlanning import JsonPlanning
@@ -29,7 +30,7 @@ class AutomateSwitchesNotifier(IAutomate, threading.Thread):
                 break
                 
             if nextAction.command() == Cmd.WAIT:
-                self.__notifiable.newStatus(self.__switches.allJsonStatuses())
+                asyncio.run(self.__notifiable.newStatus(self.__switches.allJsonStatuses()))
                 time.sleep(nextAction.time())
             elif nextAction.command() == Cmd.TURN_ON:
                 self.__switches = self.__switches.on(nextAction.index())
@@ -43,7 +44,7 @@ class AutomateSwitchesNotifier(IAutomate, threading.Thread):
             # for a pause action to do acquire
             time.sleep(0.01)
 
-        self.__notifiable.newStatus(self.__switches.allJsonStatuses())
+        asyncio.run(self.__notifiable.newStatus(self.__switches.allJsonStatuses()))
 
     def run(self):
         while not self.__terminate:
