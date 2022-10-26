@@ -18,7 +18,6 @@ class WebsocketServer(INotifiable):
         self.__startTime = 0
         self.__automate = AutomateSwitchesNotifier(switches, planning, self)
         self.__automate.start()
-        self.__startTime = 0
 
     async def handler(self, websocket):
         self.__connections.append(websocket)
@@ -30,7 +29,7 @@ class WebsocketServer(INotifiable):
                 print("Client disconnected")
                 break
             print(f"INCOMING < {str(msg)}")
-            resp = self.executeAction(msg)
+            resp = await self.executeAction(msg)
 
 
     async def run(self):
@@ -44,30 +43,34 @@ class WebsocketServer(INotifiable):
             await websocket.send(newStatus)
 
 
-    def executeAction(self, jsonInstruction):
-        print("execute action")
+    async def executeAction(self, jsonInstruction):
+        print(f"execute action: {jsonInstruction}")
         instruction = json.loads(jsonInstruction)
         command = instruction["action"]
-        if command == 'play': 
+        if command == 'play':
             self.__startTime = datetime.now()
             self.__automate.play()
-        elif command == 'stop': 
+        elif command == 'stop':
             self.__automate.stop()
-        elif command == 'pause': 
+        elif command == 'pause':
             self.__automate.pause()
-        elif command == 'resume': 
+        elif command == 'resume':
             self.__automate.resume()
-        elif command == 'terminate': 
+        elif command == 'terminate':
             self.__automate.terminate()
-        elif command == 'loadPlanning': 
+        elif command == 'loadPlanning':
             self.__automate.loadPlanning(instruction["planning"])
+        elif command == 'status':
+            await self.__automate.sendStatuses()
         else:
             print("invalid instruction")
         return 1
 
 
     def printJson(self, jsonStatuses):
-        elapsedTime = datetime.now() - self.__startTime
+        elapsedTime = 0
+        if (self.__startTime != 0):
+            elapsedTime = datetime.now() - self.__startTime
         print("After "+str(elapsedTime)+", status: ")
         dic = json.loads(jsonStatuses)
         for sw in dic:

@@ -28,9 +28,9 @@ class AutomateSwitchesNotifier(IAutomate, threading.Thread):
             if self.__stop:
                 self.__stopThread()
                 break
-                
+
             if nextAction.command() == Cmd.WAIT:
-                asyncio.run(self.__notifiable.newStatus(self.__switches.allJsonStatuses()))
+                self.sendStatuses()
                 time.sleep(nextAction.time())
             elif nextAction.command() == Cmd.TURN_ON:
                 self.__switches = self.__switches.on(nextAction.index())
@@ -40,11 +40,12 @@ class AutomateSwitchesNotifier(IAutomate, threading.Thread):
             if self.__lockPause.locked():
                 self.__lockPause.release()
 
-            # just to give time before next lockPause acquire 
+            # just to give time before next lockPause acquire
             # for a pause action to do acquire
             time.sleep(0.01)
 
-        asyncio.run(self.__notifiable.newStatus(self.__switches.allJsonStatuses()))
+        # asyncio.run(self.__notifiable.newStatus(self.__switches.allJsonStatuses()))
+        self.sendStatuses()
 
     def run(self):
         while not self.__terminate:
@@ -110,24 +111,26 @@ class AutomateSwitchesNotifier(IAutomate, threading.Thread):
     def on(self, index):
         self.__lockAction.acquire()
         self.__switches = self.__switches.forceOn(index)
-        self.__notifiable.newStatus(self.__switches.allJsonStatuses())
+        self.sendStatuses()
         self.__lockAction.release()
 
     def off(self, index):
         self.__lockAction.acquire()
         self.__switches = self.__switches.forceOff(index)
-        self.__notifiable.newStatus(self.__switches.allJsonStatuses())
+        self.sendStatuses()
         self.__lockAction.release()
 
     def allOff(self):
         self.__lockAction.acquire()
         self.__switches = self.__switches.forceAllOff()
-        self.__notifiable.newStatus(self.__switches.allJsonStatuses())
+        self.sendStatuses()
         self.__lockAction.release()
 
     def allOn(self):
         self.__lockAction.acquire()
         self.__switches = self.__switches.forceAllOn()
-        self.__notifiable.newStatus(self.__switches.allJsonStatuses())
+        self.sendStatuses()
         self.__lockAction.release()
 
+    async def sendStatuses(self):
+        await self.__notifiable.newStatus(self.__switches.allJsonStatuses())
