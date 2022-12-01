@@ -60,6 +60,18 @@ class WebsocketServer(INotifiable):
             self.__automate.terminate()
         elif command == 'loadPlanning':
             self.__automate.loadPlanning(instruction["planning"])
+        elif command == 'on':
+            await self.__automate.on(instruction["index"])
+        elif command == 'off':
+            await self.__automate.off(instruction["index"])
+        elif command == 'inhibit':
+            await self.__automate.inhibit(instruction["index"])
+        elif command == 'release':
+            await self.__automate.release(instruction["index"])
+        elif command == 'allOn':
+            await self.__automate.allOn()
+        elif command == 'allOff':
+            await self.__automate.allOff()
         elif command == 'status':
             await self.__automate.sendStatuses()
         else:

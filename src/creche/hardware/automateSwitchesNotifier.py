@@ -20,7 +20,7 @@ class AutomateSwitchesNotifier(IAutomate, threading.Thread):
         self.__lockPlay.acquire()
         self.__terminate = False
 
-    def __runAutomate(self):
+    async def __runAutomate(self):
         self.__initThread()
         for nextAction in self.__planning.actions():
             self.__lockPause.acquire()
@@ -30,7 +30,7 @@ class AutomateSwitchesNotifier(IAutomate, threading.Thread):
                 break
 
             if nextAction.command() == Cmd.WAIT:
-                self.sendStatuses()
+                await self.sendStatuses()
                 time.sleep(nextAction.time())
             elif nextAction.command() == Cmd.TURN_ON:
                 self.__switches = self.__switches.on(nextAction.index())
@@ -45,7 +45,7 @@ class AutomateSwitchesNotifier(IAutomate, threading.Thread):
             time.sleep(0.01)
 
         # asyncio.run(self.__notifiable.newStatus(self.__switches.allJsonStatuses()))
-        self.sendStatuses()
+        await self.sendStatuses()
 
     def run(self):
         while not self.__terminate:
@@ -108,28 +108,40 @@ class AutomateSwitchesNotifier(IAutomate, threading.Thread):
         self.__planning = planning
         self.__lockAction.release()
 
-    def on(self, index):
+    async def inhibit(self, index):
+        self.__lockAction.acquire()
+        self.__switches = self.__switches.inhibit(index)
+        await self.sendStatuses()
+        self.__lockAction.release()
+
+    async def release(self, index):
+        self.__lockAction.acquire()
+        self.__switches = self.__switches.release(index)
+        await self.sendStatuses()
+        self.__lockAction.release()
+
+    async def on(self, index):
         self.__lockAction.acquire()
         self.__switches = self.__switches.forceOn(index)
-        self.sendStatuses()
+        await self.sendStatuses()
         self.__lockAction.release()
 
-    def off(self, index):
+    async def off(self, index):
         self.__lockAction.acquire()
         self.__switches = self.__switches.forceOff(index)
-        self.sendStatuses()
+        await self.sendStatuses()
         self.__lockAction.release()
 
-    def allOff(self):
+    async def allOff(self):
         self.__lockAction.acquire()
         self.__switches = self.__switches.forceAllOff()
-        self.sendStatuses()
+        await self.sendStatuses()
         self.__lockAction.release()
 
-    def allOn(self):
+    async def allOn(self):
         self.__lockAction.acquire()
         self.__switches = self.__switches.forceAllOn()
-        self.sendStatuses()
+        await self.sendStatuses()
         self.__lockAction.release()
 
     async def sendStatuses(self):
